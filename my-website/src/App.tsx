@@ -196,7 +196,12 @@ section{position:relative}
 .drawer .btn{width:100%}
 
 /* ===== HERO ===== */
-.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;padding-top:var(--nav-h);background:var(--ink)}
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;padding-top:var(--nav-h)}
+.hero-media{position:absolute;inset:0;z-index:0}
+.hero-media .photo{position:absolute;inset:-6% 0 -6% 0;will-change:transform;transform:translate3d(0,var(--py,0px),0) scale(1.06)}
+.hero-media::after{content:"";position:absolute;inset:0;background:
+  linear-gradient(180deg,rgba(21,10,15,.55) 0%,rgba(21,10,15,.15) 38%,rgba(21,10,15,.92) 100%),
+  linear-gradient(90deg,rgba(21,10,15,.55),transparent 60%)}
 .hero-inner{position:relative;z-index:2;padding-bottom:clamp(28px,5vh,56px)}
 .hero h1{font-size:clamp(70px,min(17vw,25vh),280px);color:var(--cream);margin:0 0 0 -.04em}
 .hero h1 .line{display:block;overflow:hidden;white-space:nowrap;padding-top:.04em}
@@ -622,7 +627,6 @@ function Nav({ onJoin }: { onJoin: () => void }) {
       <header className={`nav ${scrolled ? "scrolled" : ""}`}>
         <div className="wrap">
           <a href="#top" className="brand" aria-label={`${CLUB.name} — back to top`} onClick={() => setOpen(false)}>
-            <img src={asset("logo.png")} alt="" width={46} height={46} />
             <span>{CLUB.name}</span>
           </a>
           <nav aria-label="Primary">
@@ -664,8 +668,31 @@ function Nav({ onJoin }: { onJoin: () => void }) {
 }
 
 function Hero() {
+  const mediaRef = useRef<HTMLDivElement>(null);
+
+  // gentle parallax on the hero photo
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let raf = 0;
+    const on = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const y = Math.min(window.scrollY, window.innerHeight);
+        mediaRef.current?.style.setProperty("--py", `${y * 0.18}px`);
+      });
+    };
+    window.addEventListener("scroll", on, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", on);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
     <section className="hero" id="top" aria-label="Welcome">
+      <div className="hero-media" ref={mediaRef}>
+        <Photo slot={PHOTOS.hero} eager />
+      </div>
       <div className="stamp" aria-hidden="true">
         <img src={asset("logo.png")} alt="" />
       </div>
