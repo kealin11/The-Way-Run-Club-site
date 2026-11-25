@@ -145,7 +145,8 @@ button{font:inherit;color:inherit;cursor:pointer}
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
 
 /* type */
-.display{font-family:var(--display);font-weight:400;text-transform:uppercase;line-height:.92;letter-spacing:.005em;margin:0}
+.display{font-family:var(--display);font-weight:400;text-transform:uppercase;line-height:.92;letter-spacing:.005em;margin:0;color:var(--cream)}
+.community .display,.success .display{color:var(--ink)}
 .serif{font-family:var(--serif);font-style:italic;font-weight:500;text-transform:none;letter-spacing:0}
 .eyebrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;font-size:12px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--blush);margin:0 0 clamp(22px,3vw,34px)}
 .eyebrow::after{content:"";height:1px;width:56px;background:var(--rose)}
