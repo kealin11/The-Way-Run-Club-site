@@ -198,7 +198,7 @@ section{position:relative}
 
 /* ===== HERO ===== */
 .hero{min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;padding-top:var(--nav-h)}
-.hero-media{position:absolute;inset:0;z-index:0}
+.hero-media{position:absolute;inset:0;z-index:0;background:var(--ink)}
 .hero-media .photo{position:absolute;inset:-6% 0 -6% 0;will-change:transform;transform:translate3d(0,var(--py,0px),0) scale(1.06)}
 .hero-media::after{content:"";position:absolute;inset:0;background:
   linear-gradient(180deg,rgba(21,10,15,.55) 0%,rgba(21,10,15,.15) 38%,rgba(21,10,15,.92) 100%),
@@ -628,6 +628,7 @@ function Nav({ onJoin }: { onJoin: () => void }) {
       <header className={`nav ${scrolled ? "scrolled" : ""}`}>
         <div className="wrap">
           <a href="#top" className="brand" aria-label={`${CLUB.name} — back to top`} onClick={() => setOpen(false)}>
+            <img src={asset("logo.png")} alt="" />
             <span>{CLUB.name}</span>
           </a>
           <nav aria-label="Primary">
@@ -691,9 +692,7 @@ function Hero() {
 
   return (
     <section className="hero" id="top" aria-label="Welcome">
-      <div className="hero-media" ref={mediaRef}>
-        <Photo slot={PHOTOS.hero} eager />
-      </div>
+      <div className="hero-media" aria-hidden="true" />
       <div className="stamp" aria-hidden="true">
         <img src={asset("logo.png")} alt="" />
       </div>
