@@ -67,8 +67,9 @@ const FORM_ENDPOINT = (import.meta.env.VITE_FORMSPREE_ENDPOINT ?? "").trim();
 const isLinkSet = (url: string) => /^https?:\/\//i.test(url) || /^(mailto|tel):/i.test(url);
 
 /* ==========================================================================
-   2. PHOTOS — images are served from /public. Update these slots when photos
-      change. Until a file exists, a branded placeholder tile is shown instead.
+   2. PHOTOS — to swap a placeholder, put a file with the same name in
+      /public/photos (e.g. public/photos/01-hero.jpg). No code changes needed.
+      Until a file exists, a branded placeholder tile is shown instead.
    ========================================================================== */
 
 type Tone = "blush" | "rose" | "peach" | "dusk";
@@ -82,22 +83,22 @@ interface PhotoSlot {
 const asset = (p: string) => `${import.meta.env.BASE_URL}${p}`;
 
 const PHOTOS = {
-  hero: { file: "IMG_5450.jpeg", alt: "The Way Run Club group gathered for a running event", caption: "The club together", tone: "dusk" },
-  about1: { file: "IMG_5447.jpeg", alt: "Two club members smiling together", caption: "Club members", tone: "blush" },
-  about2: { file: "IMG_5446.jpeg", alt: "Two members jogging together", caption: "Running together", tone: "rose" },
-  about3: { file: "IMG_5448.jpeg", alt: "Two runners getting ready to run", caption: "Ready to run", tone: "peach" },
-  exp1: { file: "IMG_5442.jpeg", alt: "Club members gathering at an event", caption: "Meet the club", tone: "rose" },
-  exp2: { file: "IMG_5441.jpeg", alt: "Members relaxing together over coffee", caption: "After the run", tone: "peach" },
-  g1: { file: "IMG_5440.jpeg", alt: "Members meeting before a club event", caption: "Before we head out", tone: "blush" },
-  g2: { file: "IMG_5446.jpeg", alt: "Two members jogging together", caption: "Out for a run", tone: "dusk" },
-  g3: { file: "IMG_5445.jpeg", alt: "Two members sharing a post-run moment", caption: "Good run, good company", tone: "rose" },
-  g4: { file: "IMG_5450.jpeg", alt: "The club gathered together at a running event", caption: "The whole club", tone: "peach" },
-  g5: { file: "IMG_5447.jpeg", alt: "Two club members standing together", caption: "Club friends", tone: "blush" },
-  g6: { file: "IMG_5443.jpeg", alt: "Members sitting together after a run", caption: "Time to catch up", tone: "dusk" },
-  g7: { file: "IMG_5449.jpeg", alt: "Three members posing together", caption: "Our community", tone: "peach" },
-  g8: { file: "IMG_5448.jpeg", alt: "Two runners getting ready to run", caption: "Run together", tone: "rose" },
-  g9: { file: "IMG_5444.jpeg", alt: "Members sharing a meal together", caption: "Together after the run", tone: "blush" },
-  cta: { file: "IMG_5442.jpeg", alt: "Club members gathering at an event", caption: "The club together", tone: "dusk" },
+  hero: { file: "01-hero.jpg", alt: "Runners moving together through the city at golden hour", caption: "Group run, motion blur", tone: "dusk" },
+  about1: { file: "02-about-group.jpg", alt: "A group of members mid-run, smiling", caption: "Members running together", tone: "blush" },
+  about2: { file: "03-about-street.jpg", alt: "A runner on a quiet street early in the morning", caption: "Street run", tone: "rose" },
+  about3: { file: "04-about-detail.jpg", alt: "Close-up of running shoes on the pavement", caption: "Shoe detail", tone: "peach" },
+  exp1: { file: "05-exp-group.jpg", alt: "Group run in progress", caption: "Group runs", tone: "rose" },
+  exp2: { file: "06-exp-social.jpg", alt: "Members chatting after a run", caption: "After-run social", tone: "peach" },
+  g1: { file: "07-gallery-01.jpg", alt: "Members at the start line before a run", caption: "Before the run", tone: "blush" },
+  g2: { file: "08-gallery-02.jpg", alt: "Runners on an outdoor trail", caption: "Outdoors", tone: "dusk" },
+  g3: { file: "09-gallery-03.jpg", alt: "Close-up of a running watch", caption: "Details: watch", tone: "rose" },
+  g4: { file: "10-gallery-04.jpg", alt: "Group photograph after a run", caption: "Group photo", tone: "peach" },
+  g5: { file: "11-gallery-05.jpg", alt: "Two runners laughing mid-stride", caption: "Mid-stride", tone: "blush" },
+  g6: { file: "12-gallery-06.jpg", alt: "Coffee and conversation after the run", caption: "Post-run coffee", tone: "dusk" },
+  g7: { file: "13-gallery-07.jpg", alt: "Runners' outfits and gear laid out", caption: "Kit", tone: "peach" },
+  g8: { file: "14-gallery-08.jpg", alt: "Runners crossing a bridge at sunrise", caption: "Sunrise run", tone: "rose" },
+  g9: { file: "15-gallery-09.jpg", alt: "Community event with members gathered", caption: "Community event", tone: "blush" },
+  cta: { file: "16-join-wide.jpg", alt: "Wide shot of the whole club running", caption: "The whole club", tone: "dusk" },
 } satisfies Record<string, PhotoSlot>;
 
 /** Gallery order + the grid shape each tile takes (see .g-* classes in CSS). */
@@ -119,6 +120,7 @@ const GALLERY: { slot: PhotoSlot; shape: "tall" | "wide" | "sq" | "big" }[] = [
 
 const CSS = String.raw`
 :root{
+  color-scheme:dark; /* this site is dark by design: stops phones applying their own light/dark colour adjustments */
   --ink:#150a0f; --ink-2:#1d1017; --ink-3:#2a1a23;
   --cream:#fcf0ea; --blush:#f8b8bc; --rose:#d49ca8; --peach:#e8a890;
   --muted:rgba(252,240,234,.62); --line:rgba(252,240,234,.16);
@@ -140,14 +142,12 @@ button{font:inherit;color:inherit;cursor:pointer}
 .skip:focus{left:8px}
 ::selection{background:var(--blush);color:var(--ink)}
 
-/* grain overlay for the editorial/film feel */
-.grain{position:fixed;inset:-50%;pointer-events:none;z-index:90;opacity:.07;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
-
-/* type */
-.display{font-family:var(--display);font-weight:400;text-transform:uppercase;line-height:.92;letter-spacing:.005em;margin:0}
+/* type — colours are set explicitly (not left to inheritance) so every browser renders headings cream */
+.display{font-family:var(--display);font-weight:400;text-transform:uppercase;line-height:.92;letter-spacing:.005em;margin:0;color:var(--cream)}
 .serif{font-family:var(--serif);font-style:italic;font-weight:500;text-transform:none;letter-spacing:0}
-.eyebrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;font-size:12px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--blush);margin:0 0 clamp(22px,3vw,34px)}
+/* ".wrap .eyebrow" is deliberately more specific than section paragraph rules (e.g. ".about-text p"),
+   which used to override the label's colour, spacing and width */
+.eyebrow,.wrap .eyebrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;font-size:12px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--blush);margin:0 0 clamp(22px,3vw,34px);max-width:none}
 .eyebrow::after{content:"";height:1px;width:56px;background:var(--rose)}
 .wrap{padding-inline:var(--pad);max-width:1480px;margin-inline:auto}
 section{position:relative}
@@ -196,7 +196,12 @@ section{position:relative}
 .drawer .btn{width:100%}
 
 /* ===== HERO ===== */
-.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;padding-top:var(--nav-h);background:var(--ink)}
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;padding-top:var(--nav-h)}
+.hero-media{position:absolute;inset:0;z-index:0}
+.hero-media .photo{position:absolute;inset:-6% 0 -6% 0;will-change:transform;transform:translate3d(0,var(--py,0px),0) scale(1.06)}
+.hero-media::after{content:"";position:absolute;inset:0;background:
+  linear-gradient(180deg,rgba(21,10,15,.55) 0%,rgba(21,10,15,.15) 38%,rgba(21,10,15,.92) 100%),
+  linear-gradient(90deg,rgba(21,10,15,.55),transparent 60%)}
 .hero-inner{position:relative;z-index:2;padding-bottom:clamp(28px,5vh,56px)}
 .hero h1{font-size:clamp(70px,min(17vw,25vh),280px);color:var(--cream);margin:0 0 0 -.04em}
 .hero h1 .line{display:block;overflow:hidden;white-space:nowrap;padding-top:.04em}
@@ -414,7 +419,7 @@ section{position:relative}
 .foot-links a:hover{color:var(--blush);transform:translateX(6px)}
 .foot-links a.off{opacity:.45;cursor:not-allowed}
 .foot-links a.off:hover{color:var(--muted);transform:none}
-.foot-word{font-family:var(--display);text-transform:uppercase;font-size:clamp(20px,7vw,120px);line-height:.95;text-align:center;margin:clamp(40px,6vw,80px) 0 0;color:transparent;-webkit-text-stroke:1.5px rgba(248,184,188,.4);white-space:normal}
+.foot-word{font-family:var(--display);text-transform:uppercase;font-size:clamp(34px,13vw,300px);line-height:.85;text-align:center;margin:clamp(40px,6vw,80px) 0 0;color:transparent;-webkit-text-stroke:1.5px rgba(248,184,188,.4);white-space:nowrap}
 .foot-bot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:26px;padding-top:22px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);letter-spacing:.06em}
 
 /* ===== RESPONSIVE ===== */
@@ -532,11 +537,11 @@ function Photo({ slot, className = "", eager = false, showLabel = true }: { slot
     <div className={`photo ${className}`}>
       {failed ? (
         <div className={`ph tone-${slot.tone}`} role="img" aria-label={slot.alt}>
-          {showLabel && <span>Placeholder · replace with public/{slot.file}</span>}
+          {showLabel && <span>Placeholder · replace with public/photos/{slot.file}</span>}
         </div>
       ) : (
         <img
-          src={asset(slot.file)}
+          src={asset(`photos/${slot.file}`)}
           alt={slot.alt}
           loading={eager ? "eager" : "lazy"}
           decoding="async"
@@ -664,8 +669,31 @@ function Nav({ onJoin }: { onJoin: () => void }) {
 }
 
 function Hero() {
+  const mediaRef = useRef<HTMLDivElement>(null);
+
+  // gentle parallax on the hero photo
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let raf = 0;
+    const on = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const y = Math.min(window.scrollY, window.innerHeight);
+        mediaRef.current?.style.setProperty("--py", `${y * 0.18}px`);
+      });
+    };
+    window.addEventListener("scroll", on, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", on);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
     <section className="hero" id="top" aria-label="Welcome">
+      <div className="hero-media" ref={mediaRef}>
+        <Photo slot={PHOTOS.hero} eager />
+      </div>
       <div className="stamp" aria-hidden="true">
         <img src={asset("logo.png")} alt="" />
       </div>
@@ -673,11 +701,11 @@ function Hero() {
       <div className="wrap hero-inner">
         <h1 className="display" aria-label="Run the way">
           <span className="line">
-            <span style={{ "--d": ".15s" } as CSSProperties}>Way</span>
+            <span style={{ "--d": ".15s" } as CSSProperties}>Run</span>
           </span>
           <span className="line">
             <span style={{ "--d": ".3s" } as CSSProperties}>
-              <span className="outline">The</span> Run<span className="accent">Club</span>
+              <span className="outline">The</span> Way<span className="accent">together</span>
             </span>
           </span>
         </h1>
@@ -991,12 +1019,23 @@ function Community() {
 
 /* ---------- Questionnaire ---------- */
 
-const REFERRAL_OPTS = ["Instagram", "Friend", "Flyer", "Strava", "TikTok", "Other"] as const;
+const EXPERIENCE_OPTS = ["Complete beginner", "Casual runner", "Regular runner", "Experienced runner"] as const;
+const DISTANCE_OPTS = ["1–3 km", "3–5 km", "5–10 km", "10 km or more"] as const;
+const GOAL_OPTS = ["Meeting new people", "Improving my fitness", "Getting into running", "Improving my running performance", "Being part of a community", "Other"] as const;
+const DAY_OPTS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] as const;
 
 interface FormValues {
   name: string;
-  newMember: string;
-  referral: string;
+  email: string;
+  phone: string;
+  instagram: string;
+  age: string;
+  experience: string;
+  distance: string;
+  goals: string[];
+  goalOther: string;
+  days: string[];
+  notes: string;
   _gotcha: string; // honeypot — real people never fill this in
 }
 type FieldKey = keyof FormValues;
@@ -1005,16 +1044,33 @@ type Status = "idle" | "sending" | "success" | "error";
 
 const EMPTY: FormValues = {
   name: "",
-  newMember: "",
-  referral: "",
+  email: "",
+  phone: "",
+  instagram: "",
+  age: "",
+  experience: "",
+  distance: "",
+  goals: [],
+  goalOther: "",
+  days: [],
+  notes: "",
   _gotcha: "",
 };
 
 function validate(v: FormValues): Errors {
   const e: Errors = {};
   if (v.name.trim().length < 2) e.name = "Please tell us your full name.";
-  if (!v.newMember) e.newMember = "Please choose yes or no.";
-  if (!v.referral) e.referral = "Please choose how you heard about us.";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.email.trim())) e.email = "Please enter a valid email address, like name@example.com.";
+  const digits = v.phone.replace(/\D/g, "");
+  if (digits.length < 7 || digits.length > 15 || !/^[+\d\s()-]+$/.test(v.phone.trim())) e.phone = "Please enter a valid mobile number, including country code if outside South Africa.";
+  if (v.instagram.trim() && !/^@?[A-Za-z0-9._]{1,30}$/.test(v.instagram.trim())) e.instagram = "Instagram usernames use letters, numbers, dots and underscores only.";
+  const age = Number(v.age);
+  if (!v.age || !Number.isInteger(age) || age < 10 || age > 99) e.age = "Please enter your age as a number between 10 and 99.";
+  if (!v.experience) e.experience = "Please choose your current running experience.";
+  if (!v.distance) e.distance = "Please choose how far you can comfortably run.";
+  if (v.goals.length === 0) e.goals = "Please pick at least one goal.";
+  if (v.goals.includes("Other") && !v.goalOther.trim()) e.goalOther = "Please tell us a little about your other goal.";
+  if (v.days.length === 0) e.days = "Please pick at least one day.";
   return e;
 }
 
@@ -1031,8 +1087,13 @@ function JoinForm() {
     setErrors((p) => (p[key] ? { ...p, [key]: undefined } : p));
   };
   const onText = (key: FieldKey) => (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => set(key, e.target.value as never);
+  const toggle = (key: "goals" | "days", item: string) => {
+    const cur = values[key];
+    set(key, cur.includes(item) ? cur.filter((x) => x !== item) : [...cur, item]);
+  };
+
   const focusFirstError = (errs: Errors) => {
-    const order: FieldKey[] = ["name", "newMember", "referral"];
+    const order: FieldKey[] = ["name", "email", "phone", "instagram", "age", "experience", "distance", "goals", "goalOther", "days"];
     const first = order.find((k) => errs[k]);
     if (!first) return;
     const el = formRef.current?.querySelector<HTMLElement>(`[data-field="${first}"] input, [data-field="${first}"] select, [data-field="${first}"] textarea`);
@@ -1065,9 +1126,17 @@ function JoinForm() {
     try {
       const payload = {
         "Full name": values.name.trim(),
-        "Are you a new member?": values.newMember,
-        "How did you hear about us?": values.referral,
+        Email: values.email.trim(),
+        "WhatsApp / mobile": values.phone.trim(),
+        Instagram: values.instagram.trim() ? `@${values.instagram.trim().replace(/^@/, "")}` : "(not provided)",
+        Age: values.age,
+        "Running experience": values.experience,
+        "Comfortable distance": values.distance,
+        Goals: values.goals.map((g) => (g === "Other" ? `Other: ${values.goalOther.trim()}` : g)).join(", "),
+        "Available days": values.days.join(", "),
+        Notes: values.notes.trim() || "(none)",
         _subject: `New member sign-up — ${values.name.trim()}`,
+        _replyto: values.email.trim(),
       };
       const res = await fetch(FORM_ENDPOINT, {
         method: "POST",
@@ -1147,29 +1216,100 @@ function JoinForm() {
                 <ErrMsg k="name" />
               </div>
 
-              <div className="field" data-field="newMember">
-                <label className="label" htmlFor="f-new-member">Are you a new member?</label>
-                <select id="f-new-member" name="newMember" className="select" value={values.newMember} onChange={onText("newMember")} required aria-required="true" aria-invalid={!!errors.newMember} aria-describedby={errors.newMember ? "err-newMember" : undefined}>
-                  <option value="" disabled>Choose yes or no</option>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                </select>
-                <ErrMsg k="newMember" />
+              <div className="row2">
+                <div className="field" data-field="email">
+                  <label className="label" htmlFor="f-email">Email address</label>
+                  <input id="f-email" name="email" className="input" type="email" inputMode="email" autoComplete="email" placeholder="you@example.com" value={values.email} onChange={onText("email")} required aria-required="true" aria-invalid={!!errors.email} aria-describedby={errors.email ? "err-email" : undefined} />
+                  <ErrMsg k="email" />
+                </div>
+                <div className="field" data-field="phone">
+                  <label className="label" htmlFor="f-phone">WhatsApp / mobile</label>
+                  <input id="f-phone" name="phone" className="input" type="tel" inputMode="tel" autoComplete="tel" placeholder="e.g. 082 123 4567" value={values.phone} onChange={onText("phone")} required aria-required="true" aria-invalid={!!errors.phone} aria-describedby={errors.phone ? "err-phone" : undefined} />
+                  <ErrMsg k="phone" />
+                </div>
+              </div>
+
+              <div className="row2">
+                <div className="field" data-field="instagram">
+                  <label className="label" htmlFor="f-ig">Instagram <span className="opt">optional</span></label>
+                  <input id="f-ig" name="instagram" className="input" type="text" autoComplete="off" autoCapitalize="none" placeholder="@yourusername" value={values.instagram} onChange={onText("instagram")} aria-invalid={!!errors.instagram} aria-describedby={errors.instagram ? "err-instagram" : undefined} />
+                  <ErrMsg k="instagram" />
+                </div>
+                <div className="field" data-field="age">
+                  <label className="label" htmlFor="f-age">Age</label>
+                  <input id="f-age" name="age" className="input" type="number" inputMode="numeric" min={10} max={99} placeholder="e.g. 28" value={values.age} onChange={onText("age")} required aria-required="true" aria-invalid={!!errors.age} aria-describedby={errors.age ? "err-age" : undefined} />
+                  <ErrMsg k="age" />
+                </div>
               </div>
             </fieldset>
 
-            <fieldset className="fieldset" data-field="referral">
-              <legend><span className="q">02</span> How did you hear about us?</legend>
-              <div className="choices" role="radiogroup" aria-required="true" aria-invalid={!!errors.referral}>
-                {REFERRAL_OPTS.map((option, i) => (
-                  <label className="choice" key={option}>
-                    <input type="radio" name="referral" value={option} checked={values.referral === option} onChange={() => set("referral", option)} required={i === 0} aria-describedby={errors.referral ? "err-referral" : undefined} />
-                    <span>{option}</span>
+            <fieldset className="fieldset" data-field="experience">
+              <legend>
+                <span className="q">02</span> Current running experience
+              </legend>
+              <div className="choices" role="radiogroup" aria-required="true" aria-invalid={!!errors.experience}>
+                {EXPERIENCE_OPTS.map((o, i) => (
+                  <label className="choice" key={o}>
+                    <input type="radio" name="experience" value={o} checked={values.experience === o} onChange={() => set("experience", o)} required={i === 0} aria-describedby={errors.experience ? "err-experience" : undefined} />
+                    <span>{o}</span>
                   </label>
                 ))}
               </div>
-              <ErrMsg k="referral" />
+              <ErrMsg k="experience" />
             </fieldset>
+
+            <div className="field" data-field="distance">
+              <label className="label" htmlFor="f-distance"><span className="q">03</span> How far can you comfortably run?</label>
+              <select id="f-distance" name="distance" className="select" value={values.distance} onChange={onText("distance")} required aria-required="true" aria-invalid={!!errors.distance} aria-describedby={errors.distance ? "err-distance" : undefined}>
+                <option value="" disabled>Choose a distance…</option>
+                {DISTANCE_OPTS.map((o) => (
+                  <option key={o} value={o}>{o}</option>
+                ))}
+              </select>
+              <ErrMsg k="distance" />
+            </div>
+
+            <fieldset className="fieldset" data-field="goals">
+              <legend>
+                <span className="q">04</span> Main goals for joining <span className="opt">pick all that apply</span>
+              </legend>
+              <div className="choices" aria-invalid={!!errors.goals}>
+                {GOAL_OPTS.map((o) => (
+                  <label className="choice" key={o}>
+                    <input type="checkbox" name="goals" value={o} checked={values.goals.includes(o)} onChange={() => toggle("goals", o)} aria-describedby={errors.goals ? "err-goals" : undefined} />
+                    <span>{o}</span>
+                  </label>
+                ))}
+              </div>
+              <ErrMsg k="goals" />
+              {values.goals.includes("Other") && (
+                <div className="other" data-field="goalOther">
+                  <label className="label" htmlFor="f-other">Tell us your other goal</label>
+                  <input id="f-other" name="goalOther" className="input" type="text" placeholder="e.g. training for a first 10 km race" value={values.goalOther} onChange={onText("goalOther")} aria-invalid={!!errors.goalOther} aria-describedby={errors.goalOther ? "err-goalOther" : undefined} />
+                  <ErrMsg k="goalOther" />
+                </div>
+              )}
+            </fieldset>
+
+            <fieldset className="fieldset" data-field="days">
+              <legend>
+                <span className="q">05</span> Days you're generally available <span className="opt">pick all that apply</span>
+              </legend>
+              <div className="chips" aria-invalid={!!errors.days}>
+                {DAY_OPTS.map((d) => (
+                  <label className="choice" key={d}>
+                    <input type="checkbox" name="days" value={d} checked={values.days.includes(d)} onChange={() => toggle("days", d)} aria-describedby={errors.days ? "err-days" : undefined} />
+                    <span>{d.slice(0, 3)}<span className="sr-only" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>{d.slice(3)}</span></span>
+                  </label>
+                ))}
+              </div>
+              <ErrMsg k="days" />
+            </fieldset>
+
+            <div className="field">
+              <label className="label" htmlFor="f-notes"><span className="q">06</span> Anything else you'd like us to know? <span className="opt">optional</span></label>
+              <textarea id="f-notes" name="notes" className="textarea" placeholder="Injuries, nerves, goals, questions — anything that helps us welcome you properly." value={values.notes} onChange={onText("notes")} maxLength={1500} />
+            </div>
 
             <div className="form-foot">
               {status === "error" && (
